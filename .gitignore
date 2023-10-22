@@ -1,3 +1,7 @@
+# ignore ml files
+*.tgz
+*.pt
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
