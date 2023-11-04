@@ -35,6 +35,7 @@ out = generator(
     num_return_sequences=5,
     do_sample=True,
 )
+
 print(out)
 
 # model = AutoModelForCausalLM.from_pretrained(model_directory)
