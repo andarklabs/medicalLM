@@ -28,10 +28,11 @@ from transformers import (
 """
 
 
-def load_data(file: str = "data/sample.json"):
+def load_data(file: str = "data/know_merge.json"):
     with open(file, "r") as f:
         data = json.load(f)
 
+    data = data[:3]
     x_train = [d["instruction"] for d in data]
     y_train = [d["output"] for d in data]
     return x_train, y_train
@@ -72,7 +73,7 @@ data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False)
 # TODO: this trains, but is it actually using instruction as input and label as goal prediction (ie QA)
 # i cant tell if this combines the instruction and answer appropriately.
 # is the value of QA dataset so this preprocess can cleanly combine the two?
-def preprocess_function(examples):
+def preprocess_function_causal(examples):
     inputs = tokenizer(
         examples["instruction"], truncation=True, padding="max_length", max_length=512
     )
@@ -90,6 +91,25 @@ def preprocess_function(examples):
 
     inputs["labels"] = labels
 
+    return inputs
+
+
+def preprocess_function(examples):
+    # create new inputs:
+    inputs = [
+        # TODO: might want to add <A> as a special token
+        " ".join(["<Q>", x, "<A>", y])
+        for x, y in zip(examples["instruction"], examples["label"])
+    ]
+    # pad the new Q..A.. sequence
+    inputs = tokenizer(inputs, trunction=True, padding="max_length", max_length=512)
+
+    # create labels:
+    labels = inputs["input_ids"].copy()
+    # shift the input to the right (so that the model predicts the next token, not wholesale
+    # answer) to get the labels we will use for training
+    labels = [[-100] + label[:-1] for label in labels]
+    inputs["labels"] = labels
     return inputs
 
 
@@ -149,7 +169,20 @@ model_to_save = (
     trainer.model.module if hasattr(trainer.model, "module") else trainer.model
 )  # Take care of distributed/parallel training
 model_to_save.save_pretrained("causal-models/")
+tokenizer.save_pretrained("causal-models/")
+model.config.save_pretrained("causal-models/")
 
+
+# from transformers import pipeline
+
+# model = pipeline("text-generation", model=model, tokenizer=tokenizer)
+# set_seed(42)
+# out = model(
+#     "what is my elbow hurting a symptom of?",
+#     max_length=20,
+#     num_return_sequences=5,
+#     do_sample=True,
+# )
 
 # model = BioGptForCausalLM.from_pretrained("microsoft/BioGPT-Large")
 # print(model.config)
