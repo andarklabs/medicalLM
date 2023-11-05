@@ -32,9 +32,8 @@ from transformers import (
 # MAKE A PROJECT
 # FIX THE PYTOML and pip install editable
 # clean up the project
+from datasets import Dataset, DatasetDict, load_dataset
 from utils import create_dataset, load_sample_data, preprocess_function
-
-x_train, y_train = load_sample_data()
 
 # model = BioGptForCausalLM.from_pretrained("microsoft/BioGPT-Large")
 # tokenizer = BioGptTokenizer.from_pretrained("microsoft/BioGPT-Large")
@@ -62,6 +61,9 @@ def preprocess_function(examples):
     inputs["labels"] = labels
     return inputs
 
+
+x_train, y_train = load_sample_data()
+dataset = create_dataset(x_train, y_train)
 
 tokenized_dataset = dataset.map(
     preprocess_function,
