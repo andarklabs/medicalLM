@@ -1,3 +1,6 @@
+# ignore causal-models/ dir
+causal-models/
+
 # ignore ml files
 *.tgz
 *.pt
