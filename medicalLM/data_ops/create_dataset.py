@@ -2,12 +2,28 @@ from datasets import load_dataset
 import pandas as pd
 import numpy as np
 
+''' dropper:
+* removes columns from a dataset in a dictionary
+
+* params:
+* - key: (str, key of the dictonary of datasets that points us to the right dataset)
+* - dropees: (list, list of columns we want to remove from our dataset)
+'''
 def dropper(key, dropees):
     datasets[key] = datasets[key].drop(dropees, axis = 1)
 
+''' remover: 
+* removes unwanted tokens from our string
+
+* params
+* - string: str
+* - unwanted_tokens: (list, list of substrings that we want
+*   to remove from our string)
+'''
 def remover(string, unwanted_tokens):
     string = str(string)
     for token in unwanted_tokens:
+        # removes token by replacing it with the empty string
         string = string.replace(token, '')
     string = string.replace('aery','artery')
     string = string.replace('.o', '.')
@@ -16,16 +32,19 @@ def remover(string, unwanted_tokens):
     string = string.replace('  ', ' ')
     return string
 
+
 datasets = {}
 
+# populate our dict `datasets` with our hugging face datasets. Each split is being combine before entering our dataset. 
 datasets['medqa'] = load_dataset("bigbio/med_qa", split="train+test+validation") # multiple choice with minimal context
 datasets['pubmedqa'] = load_dataset("pubmed_qa", "pqa_artificial", split = "train") # yes or no with long anwser (and context)
 datasets['medicationqa'] = load_dataset("truehealth/medicationqa", split = "train") # short response given question
 datasets['mmlu'] = load_dataset("cais/mmlu", "all", split = "auxiliary_train+test+validation+dev") # selection of multiplechoice questions
 datasets['medmcqa'] = load_dataset("medmcqa", split = "train+test+validation") # multiple choice questions with explaination
 
-# human validation data - RL
-#datasets['liveqa'] = load_dataset("liveqa", split = "train") # 'passages' only 
+# human validation data - RL : to be used later in our process
+load_dataset("liveqa", split = "train").to_json(path_or_buf=r'data/data_unlabeled.json') # 'passages' only 
+
 
 for key in datasets.keys():
     datasets[key] = datasets[key].to_pandas()

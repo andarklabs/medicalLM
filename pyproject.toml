@@ -9,7 +9,7 @@ readme = "README.md"
 version = "0.1.0"
 requires-python = ">=3.10.0"
 authors = [{ name = "Clark Saben", email = "csaben@mail.umw.edu"},
-{ name = "Andrew Ceniccola"}]
+{ name = "Andrew Ceniccola", email = "andrewsamce@me.com"}]
 keywords = []
 classifiers = [
     "Development Status :: 1 - MVP",
