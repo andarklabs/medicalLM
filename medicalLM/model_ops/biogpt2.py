@@ -45,7 +45,7 @@ class BioGPT(BioGptForCausalLM):
 
     METADATA_KEY: Final[str] = "metadata"
 
-    __slots__ = ["_metadata", "config"]
+    __slots__ = ["_metadata", "config", "_model"]
 
     _metadata: Final[dict[str, Any]]
 
@@ -72,6 +72,18 @@ class BioGPT(BioGptForCausalLM):
             "lora_dropout": lora_dropout,
             "target_modules": target_modules,
         }
+        self._model = None
+        # TODO: fix
+        """
+        Traceback (most recent call last):
+          File "/home/arelius/workspace/medicalLM/medicalLM/model_ops/biogpt2.py", line 216, in <module>
+            model.finetune(dataset=tokenized_dataset, collator=data_collator)
+          File "/home/arelius/workspace/medicalLM/medicalLM/model_ops/biogpt2.py", line 104, in finetune
+            peft_model = get_peft_model(self._model, peft_config)
+          File "/home/arelius/miniconda3/envs/biogpt/lib/python3.10/site-packages/peft/mapping.py", line 110, in get_peft_model
+            peft_config.base_model_name_or_path = model.__dict__.get("name_or_path", None)
+        AttributeError: 'NoneType' object has no attribute '__dict__'. Did you mean: '__dir__'?
+        """
 
     @property
     def metadata(self) -> dict[str, Any]:
@@ -88,13 +100,15 @@ class BioGPT(BioGptForCausalLM):
             target_modules=self.metadata["target_modules"],
         )
 
-    @property
-    def tokenizer(self) -> BioGptTokenizer:
-        return BioGptTokenizer.from_pretrained(self._metadata["path"])
+    @staticmethod
+    def get_tokenizer(path) -> BioGptTokenizer:
+        # tokenizer = BioGptTokenizer.from_pretrained("microsoft/BioGPT")
+        # return BioGptTokenizer.from_pretrained(self._metadata["path"])
+        return BioGptTokenizer.from_pretrained(path)
 
     def finetune(self, dataset, collator):
-        peft_config = PeftConfig(self, self.lora_config)
-        peft_model = get_peft_model(self, peft_config)
+        peft_config = PeftConfig(self.lora_config)
+        peft_model = get_peft_model(self._model, peft_config)
         # add default params for trainer
         trainer = Trainer(
             model=peft_model,
@@ -117,11 +131,30 @@ class BioGPT(BioGptForCausalLM):
         self.config.save_pretrained(self._metadata["path"])
 
     @classmethod
-    def from_pretrained(cls, path: str = DEFAULT_PATH, *model_args, **kwargs):
+    def pretrained(cls, path: str = DEFAULT_PATH, *model_args, **kwargs):
+        # config = AutoConfig.from_pretrained(path)
+        # # Initialize the model with pretrained weights.
+        # # model = super().from_pretrained(path, config=config, *model_args, **kwargs)
+        # model =
+        # # tokenizer = BioGptTokenizer.from_pretrained(path)
+        # cls._model = model
+        # return cls
         config = AutoConfig.from_pretrained(path)
-        # Initialize the model with pretrained weights.
-        model = super().from_pretrained(path, config=config, *model_args, **kwargs)
+        # # cls._model = cls(path, config=config, *model_args, **kwargs)
+        # model = super(BioGPT, cls).from_pretrained(
+        #     path, config=config, *model_args, **kwargs
+        # )
+        # return model
+        # model = cls(**data[cls.METADATA_KEY], model=data[cls.MODEL_KEY])
+        # model = BioGptForCausalLM.from_pretrained("microsoft/BioGPT")
+        underlying_model = BioGptForCausalLM.from_pretrained(path)
+        # tokenizer = BioGptTokenizer.from_pretrained("microsoft/BioGPT")
+        model = cls(path, config=config, *model_args, **kwargs)
+        model._model = underlying_model
         return model
+        # model._model.load_state_dict(data[cls.MODEL_KEY])
+
+        # model._optimizer.load_state_dict(data[cls.OPTIMIZER_KEY])
 
 
 if __name__ == "__main__":
@@ -156,8 +189,13 @@ if __name__ == "__main__":
         TrainingArguments,
     )
 
-    model = BioGPT.from_pretrained("causal-models/")
-    tokenizer = model.tokenizer
+    # model = BioGPT.from_pretrained("microsoft/BioGPT")c
+    model = BioGPT.pretrained("causal-models/")
+    print(model._model)
+    import sys
+
+    sys.exit()
+    tokenizer = model.get_tokenizer("causal-models/")
     data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False)
 
     def preprocess_function(examples):
@@ -187,7 +225,7 @@ if __name__ == "__main__":
 
     # ft
     # this is the main entry point when running `python biogpt2.py`
-    model.finetune(tokenized_dataset, collator=data_collator)
+    model.finetune(dataset=tokenized_dataset, collator=data_collator)
 
     # inf
     # import pipeline
