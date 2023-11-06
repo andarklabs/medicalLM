@@ -30,8 +30,9 @@ tokenizer = BioGptTokenizer.from_pretrained(model_directory)
 generator = pipeline("text-generation", model=model, tokenizer=tokenizer)
 set_seed(42)
 out = generator(
-    "<Q>Why does my elbow hurt?<A>",
-    max_length=20,
+    "Question: Why does my elbow hurt? Answer:",
+    # "Question: List the 23 Amino Acids below: Answer:",
+    max_length=50,
     num_return_sequences=5,
     do_sample=True,
 )
