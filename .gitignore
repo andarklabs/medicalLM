@@ -1,6 +1,10 @@
 # ignore causal-models/ dir
 causal-models/
 
+# ignore .json except sample.json
+*.json
+!sample.json
+
 # ignore ml files
 *.tgz
 *.pt

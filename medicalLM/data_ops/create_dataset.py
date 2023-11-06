@@ -70,11 +70,10 @@ dataframe = dataframe.sample(frac = 1, random_state = 42)
 data_train, data_validate, data_test = np.split(dataframe, [int(.6*len(dataframe)), int(.8*len(dataframe))])
 
 
-
-print(data_test)
-print(data_train)
-print(data_validate)
-
 data_dict = {'train': data_train, 'vaildate': data_validate, 'test': data_test}
+
+data_train.to_json(path_or_buf = r'data/data_train.json')
+data_validate.to_json(path_or_buf = r'data/data_validate.json')
+data_test.to_json(path_or_buf = r'data/data_test.json')
 
 # to turn back to arrows https://www.youtube.com/watch?v=tfcY1067A5Q
