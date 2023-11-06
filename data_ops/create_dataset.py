@@ -1,8 +1,6 @@
 from datasets import load_dataset
-from pprint import pprint
 import pandas as pd
-from transformers import AutoTokenizer
-import pyarrow
+import numpy as np
 
 def dropper(key, dropees):
     datasets[key] = datasets[key].drop(dropees, axis = 1)
@@ -11,8 +9,11 @@ def remover(string, unwanted_tokens):
     string = str(string)
     for token in unwanted_tokens:
         string = string.replace(token, '')
+    string = string.replace('aery','artery')
     string = string.replace('.o', '.')
     string = string.replace('.*', '.')
+    string = string.replace('  ', ' ')
+    string = string.replace('  ', ' ')
     return string
 
 datasets = {}
@@ -47,7 +48,12 @@ datasets['mmlu']['answer'] = datasets['mmlu'].apply(lambda row: row['choices'][r
 op_list = ['opa', 'opb', 'opc', 'opd']
 datasets['medmcqa']['answer'] = datasets['medmcqa'].apply(lambda row: row[op_list[row['cop']]], axis = 1)
 datasets['medmcqa']['answer'] = datasets['medmcqa']['answer'] + '. ' + datasets['medmcqa']['exp']
-
+unwanted_tokens = ['Ans. A ', 'Ans. B ', 'Ans. C ', 'Ans. D ', ' B ', ' C ', ' D ', ' b ', ' c ', \
+                    ' d ', "is 'a'","is 'b'", "is 'c'","is 'd'", "'a'","'b'", "'c'","'d'", 'is b ', \
+                      'is c ', 'is d ', '(a)', '(b)', '(c)', '(d)', '(A)', '(B)', '(C)', '(D)' ,'ans.', \
+                        'Ans.', 'i.e.', 'i.e.,',  'Ref:', ' , ', " :-i)", " A. ", " B. ", " C. ", " D. ",  \
+                            'Answer- A ', 'Answer- B ', 'Answer- C ', 'Answer- D ']
+datasets['medmcqa']['answer'] = datasets['medmcqa'].apply(lambda row: remover(row['answer'], unwanted_tokens), axis = 1)
 
 dropper('medqa', ['meta_info','answer_idx','options'])
 dropper('pubmedqa', ['pubid', 'context', 'final_decision', 'long_answer'])
@@ -55,18 +61,21 @@ dropper('medicationqa', ['Focus (Drug)','Question Type','Section Title','URL', '
 dropper('mmlu', ['subject', 'choices'])
 dropper('medmcqa', ['id', 'opa', 'opb', 'opc', 'opd', 'cop', 'choice_type', 'exp', 'subject_name', 'topic_name'])
 
+dataframe = pd.concat([datasets['medqa'], datasets['pubmedqa'], datasets['medicationqa'], datasets['mmlu'], datasets['medmcqa']], ignore_index=True)
 
+# shuffle our data
+dataframe = dataframe.sample(frac = 1, random_state = 42)
 
-unwanted_tokens = ['Ans. C', ' B ', ' C ', ' D ', ' b ', ' c ', ' d ', "is 'a'","is 'b'",\
-                     "is 'c'","is 'd'", "'a'","'b'", "'c'","'d'", 'is b ', 'is c ', 'is d ',\
-                        '(a)', '(b)', '(c)', '(d)', '(A)', '(B)', '(C)', '(D)' ,'ans.', \
-                        'Ans.', 'i.e.', 'Ref:']
-datasets['medmcqa']['answer'] = datasets['medmcqa'].apply(lambda row: remover(row['answer'], unwanted_tokens), axis = 1)
-
-
-for key in datasets.keys():
-    print(datasets[key].head())
+# We use 60% of our data to train our model, 20% to validate, and 20% to test
+data_train, data_validate, data_test = np.split(dataframe, [int(.6*len(dataframe)), int(.8*len(dataframe))])
 
 
 
+print(data_test)
+print(data_train)
+print(data_validate)
+
+data_dict = {'train': data_train, 'vaildate': data_validate, 'test': data_test}
+
+print(data_dict)
 # to turn back to arrows https://www.youtube.com/watch?v=tfcY1067A5Q
