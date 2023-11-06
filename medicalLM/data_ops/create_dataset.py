@@ -77,5 +77,4 @@ print(data_validate)
 
 data_dict = {'train': data_train, 'vaildate': data_validate, 'test': data_test}
 
-print(data_dict)
 # to turn back to arrows https://www.youtube.com/watch?v=tfcY1067A5Q
