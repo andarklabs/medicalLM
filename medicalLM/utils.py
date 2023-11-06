@@ -32,6 +32,23 @@ def load_sample_data(file: str = "data/know_merge.json", sample=3):
     return x_train, y_train
 
 
+def load_preprocessed_data(file: str = "data/data_train.json", sample=3):
+    train_dict = json.load(open(file, "r"))
+    # print(train_dict["question"]["69922"])
+    # print(train_dict["answer"]["69922"])
+    x_train = [
+        train_dict["question"][identifier]
+        for identifier in train_dict["question"].keys()
+    ]
+    y_train = [
+        train_dict["answer"][identifier] for identifier in train_dict["answer"].keys()
+    ]
+    return x_train, y_train
+
+
+load_preprocessed_data()
+
+
 def create_dataset(x_train, y_train):
     # create new dataset
     dataset = DatasetDict(

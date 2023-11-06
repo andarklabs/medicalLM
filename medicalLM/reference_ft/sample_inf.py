@@ -22,7 +22,7 @@ from transformers import (
 )
 
 # # Load the trained model
-model_directory = "causal-models/"
+model_directory = "causal-models/preprocessed"
 
 
 model = BioGptForCausalLM.from_pretrained(model_directory)
