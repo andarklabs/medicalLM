@@ -36,8 +36,26 @@ tokenizer = BioGptTokenizer.from_pretrained("microsoft/BioGPT")
 tokenizer.pad_token = tokenizer.eos_token
 data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False)
 
+'''we need to have more unique end tokens
+        self.model_input = """
+<|im_start|>system
+{system_message}<|im_end|>
+<|im_start|>user
+{prompt}<|im_end|>
+<|im_start|>assistant""".format(
+            system_message=self.system_message,
+            prompt=self.prompt,
+        )
+'''
 
-def refactor_preprocess_function(examples):
+
+def causal_preprocess_function(examples) -> dict:
+    return NotImplementedError
+
+
+def qa_preprocess_function(examples):
+    inputs = ["<im_start> " + q + " <im_end>" for q in examples["instruction"]]
+    targets = ["<im_start> " + a + " <im_end>" for a in examples["label"]]
     inputs = [f"Question: {q} Answer:" for q in examples["instruction"]]
     targets = [a for a in examples["label"]]
     model_inputs = tokenizer(
@@ -60,13 +78,11 @@ def refactor_preprocess_function(examples):
     return model_inputs
 
 
-# x_train, y_train = load_sample_data()
 x_train, y_train = load_preprocessed_data()
 dataset = create_dataset(x_train, y_train)
 
 tokenized_dataset = dataset.map(
-    # preprocess_function,
-    refactor_preprocess_function,
+    qa_preprocess_function,
     batched=True,
     remove_columns=["instruction", "label"],
 )
@@ -85,7 +101,7 @@ model = get_peft_model(model, peft_config)
 model.print_trainable_parameters()
 
 training_args = TrainingArguments(
-    output_dir="causal-models/preprocessed",
+    output_dir="causal-models/preprocessed-2",
     evaluation_strategy="epoch",
     learning_rate=2e-5,
     weight_decay=0.01,
@@ -109,6 +125,6 @@ trainer.train()
 model_to_save = (
     trainer.model.module if hasattr(trainer.model, "module") else trainer.model
 )  # Take care of distributed/parallel training
-model_to_save.save_pretrained("causal-models/preprocessed")
-tokenizer.save_pretrained("causal-models/preprocessed")
-model.config.save_pretrained("causal-models/preprocessed")
+model_to_save.save_pretrained("causal-models/preprocessed-2")
+tokenizer.save_pretrained("causal-models/preprocessed-2")
+model.config.save_pretrained("causal-models/preprocessed-2")

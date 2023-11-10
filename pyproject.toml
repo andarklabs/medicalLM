@@ -6,7 +6,6 @@ build-backend = "setuptools.build_meta"
 name = "medicalLM"
 description= "finetune causal model to take question and emit answer"
 readme = "README.md"
-version = "0.1.0"
 requires-python = ">=3.10.0"
 authors = [{ name = "Clark Saben", email = "csaben@mail.umw.edu"},
 { name = "Andrew Ceniccola", email = "andrewsamce@me.com"}]
@@ -24,14 +23,21 @@ dependencies = [
 	"python-dotenv",
 	"pandas",
 	"numpy",
-	"datasets"
+	"datasets",
+    "fire"
 ]
 
 optional-dependencies = { dev = ["pytest", "ruff", "black", "flake8", "mypy"]}
+dynamic=["version"]
+
+[tool.setuptools.dynamic]
+version = {file = ["medicalLM/VERSION.txt"]}
 
 [tool.setuptools]
 zip-safe = true
 include-package-data = true
+
+
 
 [tool.isort]
 profile = "black"
