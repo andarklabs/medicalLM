@@ -6,7 +6,7 @@ generator = pipeline("text-generation", model=model, tokenizer=tokenizer)
 set_seed(42)
 out = generator(
     "<Q>Why does my elbow hurt?<A>",
-    max_length=20,
+    max_length=180,
     num_return_sequences=5,
     do_sample=True,
 )
