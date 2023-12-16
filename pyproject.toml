@@ -17,15 +17,15 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
 ]
 urls = { code = "https://github.com/andrarklabs/medicalLM" }
-dependencies = [
-	"peft",
-	"transformers",	
-	"python-dotenv",
-	"pandas",
-	"numpy",
-	"datasets",
-    "fire"
-]
+# dependencies = [
+# 	"peft",
+# 	"transformers",	
+# 	"python-dotenv",
+# 	"pandas",
+# 	"numpy",
+# 	"datasets",
+#     "fire"
+# ]
 
 optional-dependencies = { dev = ["pytest", "ruff", "black", "flake8", "mypy"]}
 dynamic=["version"]
