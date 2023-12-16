@@ -4,7 +4,7 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 
 class Model():
     def __init__(self, model) -> None:
-        f = open('/Users/andrewceniccola/Desktop/medicalLM/medicalLM/frontend/models.json')
+        f = open('medicalLM/medicalLM/frontend/models.json')
         self.mod_data = json.load(f)[model]
         self.tokenizer = AutoTokenizer.from_pretrained(self.mod_data['url'])
         self.model = AutoModelForCausalLM.from_pretrained(self.mod_data['url'])
