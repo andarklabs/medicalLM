@@ -1,35 +1,17 @@
-import json
-
-import evaluate
-import numpy as np
-import torch
-from datasets import Dataset, DatasetDict, load_dataset
-from peft import LoraConfig, PeftConfig, PeftModel, TaskType, get_peft_model
+from peft import LoraConfig, TaskType, get_peft_model
 from transformers import (
-    AutoConfig,
-    AutoModelForCausalLM,
-    AutoModelForSequenceClassification,
-    AutoTokenizer,
     BioGptForCausalLM,
     BioGptTokenizer,
     DataCollatorForLanguageModeling,
-    DataCollatorWithPadding,
     Trainer,
     TrainingArguments,
-    pipeline,
     set_seed,
 )
 
 set_seed(42)
 
-from datasets import Dataset, DatasetDict, load_dataset
 
-from utils import (
-    create_dataset,
-    load_preprocessed_data,
-    load_sample_data,
-    preprocess_function,
-)
+from medicalLM.utils import create_dataset, load_preprocessed_data
 
 model = BioGptForCausalLM.from_pretrained("microsoft/BioGPT")
 tokenizer = BioGptTokenizer.from_pretrained("microsoft/BioGPT")
