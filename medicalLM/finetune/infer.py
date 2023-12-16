@@ -4,7 +4,8 @@ from transformers import BioGptForCausalLM, BioGptTokenizer, pipeline, set_seed
 
 
 def infer(
-    model_directory: str = "./causal-models",
+    # model_directory: str = "./causal-models",
+    model_directory: str = "causal-models/preprocessed/checkpoint-94500/",
     prompt: str = "What are the 23 amino acids?",
     num_return_sequences: int = 1,
     max_length: int = 200,
@@ -24,5 +25,7 @@ def infer(
 
 
 if __name__ == "__main__":
+    # set model_directory to the dir you download this: https://huggingface.co/arelius/MedicalLM/tree/main
+    # at
     out = infer()
     print(out)
