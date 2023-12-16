@@ -4,6 +4,7 @@ causal-models/
 # ignore .json except sample.json
 *.json
 !sample.json
+!models.json
 
 # ignore ml files
 *.tgz

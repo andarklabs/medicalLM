@@ -6,7 +6,6 @@ import fire
 import numpy as np
 import torch
 from datasets import Dataset, DatasetDict, load_dataset
-from peft import LoraConfig, PeftConfig, PeftModel, TaskType, get_peft_model
 from transformers import (
     AutoConfig,
     AutoModelForCausalLM,
