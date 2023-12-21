@@ -8,10 +8,10 @@ from transformers import (
     set_seed,
 )
 
+from medicalLM.utils import create_dataset, load_preprocessed_data
+
 set_seed(42)
 
-
-from medicalLM.utils import create_dataset, load_preprocessed_data
 
 model = BioGptForCausalLM.from_pretrained("microsoft/BioGPT")
 tokenizer = BioGptTokenizer.from_pretrained("microsoft/BioGPT")

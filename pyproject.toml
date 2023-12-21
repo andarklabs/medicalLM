@@ -27,6 +27,7 @@ urls = { code = "https://github.com/andrarklabs/medicalLM" }
 #     "fire"
 # ]
 
+
 optional-dependencies = { dev = ["pytest", "ruff", "black", "flake8", "mypy"]}
 dynamic=["version"]
 
@@ -44,6 +45,10 @@ profile = "black"
 src_paths = ["medicalLM"]
 
 [tool.mypy]
+packages = [
+    {include = "medicalLM"},
+    {include = "medicalLM/py.typed"}
+]
 disallow_untyped_calls = true
 disallow_untyped_imports = true
 disallow_untyped_defs = true

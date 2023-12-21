@@ -1,5 +1,16 @@
 # ignore causal-models/ dir
 causal-models/
+data/
+
+# Compiled binary addons (http://nodejs.org/api/addons.html)
+build/Release
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Distribution directories
+dist/
 
 # ignore .json except sample.json
 *.json
